@@ -12,6 +12,11 @@ void screens(int screen) {
         Brain.Screen.setPenColor(vex::color::black);
         Brain.Screen.setPenWidth(2);
         
+        yDisplacement = 0;
+        xDisplacement = 120;
+        x = xDisplacement;
+        y = yDisplacement;
+        
         for (int i = 0; i < tiles; i++) {
             x = xDisplacement;
             for (int j = 0; j < tiles; j++) {
@@ -186,24 +191,33 @@ void screens(int screen) {
             }
         }
         
-        int buttons[3][2][2] = {
-            {{0, 160}, {25,240}},
-            {{160, 320}, {25,240}},
-            {{320, 480}, {25,240}}
+        int buttons[4][2][2] = {
+            {{0, 160}, {25, 180}},
+            {{160, 320}, {25, 180}},
+            {{320, 480}, {25, 180}},
+            {{400, 480}, {180, 240}}
         };
         
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < 4; i++)
         {
-            int length = buttons[i][0][1] - buttons[i][0][0];
-            int width = buttons[i][1][1] - buttons[i][1][0];
+            int width = buttons[i][0][1] - buttons[i][0][0];
+            int length = buttons[i][1][1] - buttons[i][1][0];
 
             Brain.Screen.setPenColor(vex::color::black);
             Brain.Screen.drawRectangle(buttons[i][0][0], buttons[i][1][0], width, length, color+(i*30));
+            if(i == 3) {
+                Brain.Screen.drawRectangle(buttons[i][0][0], buttons[i][1][0], width, length, vex::color::white);
+            }
         }
+        
+        Brain.Screen.setCursor(11, 43);
+        Brain.Screen.setPenColor(vex::color::black);
+        Brain.Screen.setFillColor(vex::color::white);
+        Brain.Screen.print("Back");
         
         buttonPressed = 0;
         while (buttonPressed == 0) {
-            for(int i = 0; i < 3; i++)
+            for(int i = 0; i < 4; i++)
             {
                 if(((Brain.Screen.xPosition() > buttons[i][0][0]) && 
                     (Brain.Screen.xPosition() < buttons[i][0][1])) && 
@@ -217,8 +231,10 @@ void screens(int screen) {
             }
             vex::task::sleep(25);
         }
-        Brain.Screen.setPenColor(vex::color::black);
-        if (red) {
+        
+        if (buttonPressed == 4) {
+            screens(1);
+        } else if (red) {
             if (front) {
                 if (buttonPressed == 1) {
                     auton = 1;
@@ -304,6 +320,42 @@ void screens(int screen) {
         } else if (auton == 12) {
             Brain.Screen.setCursor(1, 1);
             Brain.Screen.print("Auton 12.");
+        }
+        
+        int buttons[1][2][2] = {
+            {{400, 480}, {180, 240}}
+        };
+        
+        for(int i = 0; i < 1; i++)
+        {
+            int width = buttons[i][0][1] - buttons[i][0][0];
+            int length = buttons[i][1][1] - buttons[i][1][0];
+
+            Brain.Screen.setPenColor(vex::color::black);
+            Brain.Screen.drawRectangle(buttons[i][0][0], buttons[i][1][0], width, length, vex::color::white);
+        }
+        
+        Brain.Screen.setCursor(11, 43);
+        Brain.Screen.setPenColor(vex::color::black);
+        Brain.Screen.setFillColor(vex::color::white);
+        Brain.Screen.print("Back");
+        
+        buttonPressed = 0;
+        while (buttonPressed == 0) {
+            for(int i = 0; i < 1; i++)
+            {
+                if(((Brain.Screen.xPosition() > buttons[i][0][0]) && 
+                    (Brain.Screen.xPosition() < buttons[i][0][1])) && 
+                   ((Brain.Screen.yPosition() > buttons[i][1][0] && 
+                     Brain.Screen.yPosition() < buttons[i][1][1])) &&
+                   Brain.Screen.pressing())
+                {
+                    vex::task::sleep(1000); //or add wait until function...
+                    screens(2);
+                    buttonPressed = i+1;
+                }
+            }
+            vex::task::sleep(25);
         }
     }
 }
