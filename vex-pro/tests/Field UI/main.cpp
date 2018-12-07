@@ -69,14 +69,12 @@ void screens(int screen) {
             {{140, 226}, {60, 60}}
         };
         
-        for(int i = 0; i < 8; i++)
-        {
+        for(int i = 0; i < 8; i++) {
             Brain.Screen.setPenColor(caps[i][1][0]);
             Brain.Screen.drawCircle(caps[i][0][0]+xDisplacement, caps[i][0][1]+yDisplacement, capsRadiusPX, caps[i][1][1]);
         }
         
-        for(int i = 0; i < 4; i++)
-        {
+        for(int i = 0; i < 4; i++) {
             int length = buttons[i][0][1] - buttons[i][0][0];
             int width = buttons[i][1][1] - buttons[i][1][0];
 
@@ -115,8 +113,7 @@ void screens(int screen) {
         Brain.Screen.drawLine(40+xDisplacement, 20+yDisplacement, 20+xDisplacement, 20+yDisplacement);
         Brain.Screen.drawLine(120+xDisplacement, 20+yDisplacement, 106+xDisplacement, 6+yDisplacement);
         
-        for(int i = 0; i < 3; i++)
-        {
+        for(int i = 0; i < 3; i++) {
             int length = platforms[i][0][1] - platforms[i][0][0];
             int width = platforms[i][1][1] - platforms[i][1][0];
 
@@ -124,22 +121,19 @@ void screens(int screen) {
             Brain.Screen.drawRectangle(platforms[i][0][0]+xDisplacement, platforms[i][1][0]+yDisplacement, width, length, platforms[i][2][1]);
         }
         
-        for(int i = 0; i < 16; i++)
-        {
+        for(int i = 0; i < 16; i++) {
             Brain.Screen.setPenColor(balls[i][1][0]);
             Brain.Screen.drawCircle(balls[i][0][0]+xDisplacement, balls[i][0][1]+yDisplacement, ballsRadiusPX, balls[i][1][1]);
         }
         
         buttonPressed = 0;
         while (buttonPressed == 0) {
-            for(int i = 0; i < 4; i++)
-            {
+            for(int i = 0; i < 4; i++) {
                 if(((Brain.Screen.xPosition() > buttons[i][0][0]+xDisplacement) && 
                     (Brain.Screen.xPosition() < buttons[i][0][1]+xDisplacement)) && 
                    ((Brain.Screen.yPosition() > buttons[i][1][0]+yDisplacement && 
                      Brain.Screen.yPosition() < buttons[i][1][1]+yDisplacement)) &&
-                   Brain.Screen.pressing())
-                {
+                   Brain.Screen.pressing()) {
                     vex::task::sleep(1000); //or add wait until function...
                     buttonPressed = i+1;
                 }
@@ -198,8 +192,7 @@ void screens(int screen) {
             {{400, 480}, {180, 240}}
         };
         
-        for(int i = 0; i < 4; i++)
-        {
+        for(int i = 0; i < 4; i++) {
             int width = buttons[i][0][1] - buttons[i][0][0];
             int length = buttons[i][1][1] - buttons[i][1][0];
 
@@ -217,14 +210,12 @@ void screens(int screen) {
         
         buttonPressed = 0;
         while (buttonPressed == 0) {
-            for(int i = 0; i < 4; i++)
-            {
+            for(int i = 0; i < 4; i++) {
                 if(((Brain.Screen.xPosition() > buttons[i][0][0]) && 
                     (Brain.Screen.xPosition() < buttons[i][0][1])) && 
                    ((Brain.Screen.yPosition() > buttons[i][1][0] && 
                      Brain.Screen.yPosition() < buttons[i][1][1])) &&
-                   Brain.Screen.pressing())
-                {
+                   Brain.Screen.pressing()) {
                     vex::task::sleep(1000); //or add wait until function...
                     buttonPressed = i+1;
                 }
@@ -326,8 +317,7 @@ void screens(int screen) {
             {{400, 480}, {180, 240}}
         };
         
-        for(int i = 0; i < 1; i++)
-        {
+        for(int i = 0; i < 1; i++) {
             int width = buttons[i][0][1] - buttons[i][0][0];
             int length = buttons[i][1][1] - buttons[i][1][0];
 
@@ -342,14 +332,12 @@ void screens(int screen) {
         
         buttonPressed = 0;
         while (buttonPressed == 0) {
-            for(int i = 0; i < 1; i++)
-            {
+            for(int i = 0; i < 1; i++) {
                 if(((Brain.Screen.xPosition() > buttons[i][0][0]) && 
                     (Brain.Screen.xPosition() < buttons[i][0][1])) && 
                    ((Brain.Screen.yPosition() > buttons[i][1][0] && 
                      Brain.Screen.yPosition() < buttons[i][1][1])) &&
-                   Brain.Screen.pressing())
-                {
+                   Brain.Screen.pressing()) {
                     vex::task::sleep(1000); //or add wait until function...
                     screens(2);
                     buttonPressed = i+1;
