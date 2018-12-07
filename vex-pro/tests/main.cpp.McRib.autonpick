@@ -504,5 +504,7 @@ int main() {
     Competition.autonomous( autonomous );
     Competition.drivercontrol( usercontrol );
     
-    vex::task::sleep(25);
+    while(1) {
+        vex::task::sleep(25);
+    }
 }
