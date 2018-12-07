@@ -9,4 +9,5 @@ int xDisplacement = 120;
 int x = xDisplacement;
 int y = yDisplacement;
 
-int capsRadiusPX = 10;
+int capsRadiusPX = 7;
+int ballsRadiusPX = 1;

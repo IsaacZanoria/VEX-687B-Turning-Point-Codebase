@@ -45,6 +45,25 @@ void screens(int screen) {
             {{140, 220}, {0, 0}}
         };
         
+        int balls[16][2][2] = {
+            {{65, 120}, {60, 60}},
+            {{65, 160}, {60, 60}},
+            {{175, 120}, {60, 60}},
+            {{175, 160}, {60, 60}},
+            {{100, 100}, {60, 60}},
+            {{140, 100}, {60, 60}},
+            {{100, 180}, {60, 60}},
+            {{140, 180}, {60, 60}},
+            {{55, 55}, {60, 60}},
+            {{65, 65}, {60, 60}},
+            {{175, 65}, {60, 60}},
+            {{185, 55}, {60, 60}},
+            {{100, 214}, {60, 60}},
+            {{100, 226}, {60, 60}},
+            {{140, 214}, {60, 60}},
+            {{140, 226}, {60, 60}}
+        };
+        
         for(int i = 0; i < 8; i++)
         {
             Brain.Screen.setPenColor(caps[i][1][0]);
@@ -98,6 +117,12 @@ void screens(int screen) {
 
             Brain.Screen.setPenColor(platforms[i][2][0]);
             Brain.Screen.drawRectangle(platforms[i][0][0]+xDisplacement, platforms[i][1][0]+yDisplacement, width, length, platforms[i][2][1]);
+        }
+        
+        for(int i = 0; i < 16; i++)
+        {
+            Brain.Screen.setPenColor(balls[i][1][0]);
+            Brain.Screen.drawCircle(balls[i][0][0]+xDisplacement, balls[i][0][1]+yDisplacement, ballsRadiusPX, balls[i][1][1]);
         }
         
         buttonPressed = 0;
