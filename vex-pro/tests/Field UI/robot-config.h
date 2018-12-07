@@ -8,3 +8,5 @@ int yDisplacement = 0;
 int xDisplacement = 120;
 int x = xDisplacement;
 int y = yDisplacement;
+
+int capsRadiusPX = 10;
