@@ -371,7 +371,8 @@ void usercontrol( void ) {
       }
       else { //If the button A is not pressed...
           ///...Slow the flywheel.
-          if (getFlywheelRPM() < ((flySpeedPCT*2)/4)) {
+          if (getFlywheelRPM() < (flySpeedPCT/2))
+          {
               Flywheel.spin(vex::directionType::rev, flySpeedPCT/4, vex::velocityUnits::pct);
           } else {
               Flywheel.stop(vex::brakeType::coast);
