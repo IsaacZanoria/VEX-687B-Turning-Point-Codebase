@@ -28,6 +28,12 @@ void screens(int screen) {
             {{200, 240}, {160, 200}, {240, 240}}    //4: Bottom Right Blue
         };
         
+        int platforms[3][3][2] = {
+            {{65, 105}, {100, 140}, {0, 0}}, //red
+            {{135, 175}, {100, 140}, {240, 240}}, //blue
+            {{100, 140}, {100, 140}, {60, 60}} //yellow
+        };
+        
         for(int i = 0; i < 4; i++)
         {
             int length = buttons[i][0][1] - buttons[i][0][0];
@@ -35,6 +41,25 @@ void screens(int screen) {
 
             Brain.Screen.setPenColor(buttons[i][2][0]);
             Brain.Screen.drawRectangle(buttons[i][0][0]+xDisplacement, buttons[i][1][0]+yDisplacement, width, length, buttons[i][2][1]);
+        }
+        
+        Brain.Screen.setPenColor(vex::color::white);
+        Brain.Screen.setPenWidth(2);
+        Brain.Screen.drawLine(0+xDisplacement, 120+yDisplacement, 40+xDisplacement, 120+yDisplacement);
+        Brain.Screen.drawLine(200+xDisplacement, 120+yDisplacement, 240+xDisplacement, 120+yDisplacement);
+        Brain.Screen.drawLine(40+xDisplacement, 120+yDisplacement, 40+xDisplacement, 200+yDisplacement);
+        Brain.Screen.drawLine(200+xDisplacement, 120+yDisplacement, 200+xDisplacement, 200+yDisplacement);
+        
+        Brain.Screen.drawLine(40+xDisplacement, 200+yDisplacement, 200+xDisplacement, 200+yDisplacement);
+        Brain.Screen.drawLine(120+xDisplacement, 240+yDisplacement, 120+xDisplacement, 0+yDisplacement);
+        
+        for(int i = 0; i < 3; i++)
+        {
+            int length = platforms[i][0][1] - platforms[i][0][0];
+            int width = platforms[i][1][1] - platforms[i][1][0];
+
+            Brain.Screen.setPenColor(platforms[i][2][0]);
+            Brain.Screen.drawRectangle(platforms[i][0][0]+xDisplacement, platforms[i][1][0]+yDisplacement, width, length, platforms[i][2][1]);
         }
         
         buttonPressed = 0;
