@@ -29,10 +29,27 @@ void screens(int screen) {
         };
         
         int platforms[3][3][2] = {
-            {{65, 105}, {100, 140}, {0, 0}}, //red
-            {{135, 175}, {100, 140}, {240, 240}}, //blue
-            {{100, 140}, {100, 140}, {60, 60}} //yellow
+            {{65, 105}, {120, 160}, {0, 0}}, //red
+            {{135, 175}, {120, 160}, {240, 240}}, //blue
+            {{100, 140}, {120, 160}, {60, 60}} //yellow
         };
+        
+        int caps[8][2][2] = {
+            {{60, 60}, {240, 240}},
+            {{100, 100}, {0, 0}},
+            {{100, 180}, {0, 0}},
+            {{100, 220}, {240, 240}},
+            {{180, 60}, {0, 0}},
+            {{140, 100}, {240, 240}},
+            {{140, 180}, {240, 240}},
+            {{140, 220}, {0, 0}}
+        };
+        
+        for(int i = 0; i < 8; i++)
+        {
+            Brain.Screen.setPenColor(caps[i][1][0]);
+            Brain.Screen.drawCircle(caps[i][0][0]+xDisplacement, caps[i][0][1]+yDisplacement, capsRadiusPX, caps[i][1][1]);
+        }
         
         for(int i = 0; i < 4; i++)
         {
@@ -43,6 +60,7 @@ void screens(int screen) {
             Brain.Screen.drawRectangle(buttons[i][0][0]+xDisplacement, buttons[i][1][0]+yDisplacement, width, length, buttons[i][2][1]);
         }
         
+        //Expansion Zone
         Brain.Screen.setPenColor(vex::color::white);
         Brain.Screen.setPenWidth(2);
         Brain.Screen.drawLine(0+xDisplacement, 120+yDisplacement, 40+xDisplacement, 120+yDisplacement);
@@ -52,6 +70,26 @@ void screens(int screen) {
         
         Brain.Screen.drawLine(40+xDisplacement, 200+yDisplacement, 200+xDisplacement, 200+yDisplacement);
         Brain.Screen.drawLine(120+xDisplacement, 240+yDisplacement, 120+xDisplacement, 0+yDisplacement);
+        
+        //Flag Pole
+        Brain.Screen.setPenColor(vex::color::black);
+        Brain.Screen.setPenWidth(7);
+        Brain.Screen.drawLine(0+xDisplacement, 0+yDisplacement, 0+xDisplacement, 40+yDisplacement);
+        Brain.Screen.drawLine(0+xDisplacement, 0+yDisplacement, 240+xDisplacement, 0+yDisplacement);
+        Brain.Screen.drawLine(240+xDisplacement, 0+yDisplacement, 240+xDisplacement, 40+yDisplacement);
+        Brain.Screen.drawLine(40+xDisplacement, 0+yDisplacement, 40+xDisplacement, 20+yDisplacement);
+        Brain.Screen.drawLine(120+xDisplacement, 0+yDisplacement, 120+xDisplacement, 20+yDisplacement);
+        Brain.Screen.drawLine(200+xDisplacement, 0+yDisplacement, 200+xDisplacement, 20+yDisplacement);
+        
+        //Flags
+        Brain.Screen.setPenWidth(3);
+        Brain.Screen.setPenColor(vex::color::red);
+        Brain.Screen.drawLine(120+xDisplacement, 20+yDisplacement, 134+xDisplacement, 6+yDisplacement);
+        Brain.Screen.drawLine(200+xDisplacement, 20+yDisplacement, 220+xDisplacement, 20+yDisplacement);
+        
+        Brain.Screen.setPenColor(vex::color::blue);
+        Brain.Screen.drawLine(40+xDisplacement, 20+yDisplacement, 20+xDisplacement, 20+yDisplacement);
+        Brain.Screen.drawLine(120+xDisplacement, 20+yDisplacement, 106+xDisplacement, 6+yDisplacement);
         
         for(int i = 0; i < 3; i++)
         {
@@ -246,5 +284,5 @@ void screens(int screen) {
 }
 
 int main() {
-       screens(1);
+    screens(1);
 }
