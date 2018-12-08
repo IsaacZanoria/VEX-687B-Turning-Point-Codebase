@@ -1,28 +1,31 @@
 vex::brain Brain;
 
-vex::motor  LeftFront(vex::PORT18, vex::gearSetting::ratio18_1, true);
-vex::motor  LeftBack(vex::PORT17, vex::gearSetting::ratio18_1, true);
-vex::motor  RightFront(vex::PORT20, vex::gearSetting::ratio18_1, true);
-vex::motor  RightBack(vex::PORT19, vex::gearSetting::ratio18_1, true);
-vex::motor  Flywheel(vex::PORT2, vex::gearSetting::ratio18_1, true);
-vex::motor  Arm(vex::PORT3, vex::gearSetting::ratio18_1, true);
-vex::motor  Claw(vex::PORT4, vex::gearSetting::ratio18_1, true);
-vex::motor  Intake(vex::PORT1, vex::gearSetting::ratio18_1, true);
+vex::motor  left_front(vex::PORT18, vex::gearSetting::ratio18_1, true);
+vex::motor  left_back(vex::PORT17, vex::gearSetting::ratio18_1, true);
+vex::motor  right_front(vex::PORT20, vex::gearSetting::ratio18_1, true);
+vex::motor  right_back(vex::PORT19, vex::gearSetting::ratio18_1, true);
+vex::motor  flywheel(vex::PORT2, vex::gearSetting::ratio18_1, true);
+vex::motor  arm(vex::PORT3, vex::gearSetting::ratio18_1, true);
+vex::motor  cap_intake(vex::PORT4, vex::gearSetting::ratio18_1, true);
+vex::motor  ball_intake(vex::PORT1, vex::gearSetting::ratio18_1, true);
 
-vex::controller Controller(vex::controllerType::primary);
+vex::controller controller(vex::controllerType::primary);
 
-int flySpeedPCT = 100;
-int intakeSpeedPCT = 100;
-int armSpeedPCT = 50;
+vex::competition  competition;
+
+int drive_speed_percentage = 75;
+int flywheel_speed_percentage = 100;
+int ball_intake_speed_percentage = 100;
+int arm_speed_percentage = 70;
 
 //Field
 int tiles = 6;
 int tile_px = 240/tiles;
 
-int yDisplacement = 0;
-int xDisplacement = 120;
-int x = xDisplacement;
-int y = yDisplacement;
+int x_displacement = 120;
+int y_displacement = 0;
+int x = x_displacement;
+int y = y_displacement;
 
 int capsRadiusPX = 7;
 int ballsRadiusPX = 1;

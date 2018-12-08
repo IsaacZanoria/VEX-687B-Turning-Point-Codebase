@@ -1,8 +1,6 @@
 #include "robot-config.h"
 
-vex::competition    Competition;
-
-int buttonPressed = 0;
+int button_pressed = 0;
 
 bool red;
 bool front;
@@ -10,30 +8,30 @@ int auton = 0;
 
 int promise = 4;
 
-int getFlywheelRPM(){
+int get_flywheel_rpm(){
     return Flywheel.velocity(vex::velocityUnits::rpm)*-1;
 }
 
-void controllerPrint(){
+void controller_print(){
     while (1){
-        Controller.Screen.clearScreen();
-        Controller.Screen.print(getFlywheelRPM());
+        controller.Screen.clearScreen();
+        controller.Screen.print(get_flywheel_rpm());
         vex::task::sleep(250);
     }
 }
 
-void controllerVibrate(){
+void controller_vibrate(){
     while(1){
-        if (getFlywheelRPM() > 170){
-            Controller.rumble("-");
+        if (get_flywheel_rpm() > 170){
+            controller.rumble("-");
         }
     }
 }
 
 void move(bool reverse, double inches, double percent, bool asynchronous) {
     
-    double degPerInch = 27;//28.64 is actual
-    double rotationGoal = degPerInch*inches;
+    double degrees_per_inch = 27;//28.64 is actual
+    double rotation_goal = degrees_per_inch*inches;
     
     bool left;
     bool right;
@@ -45,49 +43,49 @@ void move(bool reverse, double inches, double percent, bool asynchronous) {
         right = true;
     }
     
-    LeftFront.setReversed(left);
-    LeftBack.setReversed(left);
-    RightFront.setReversed(right);
-    RightBack.setReversed(right);
+    left_front.setReversed(left);
+    left_back.setReversed(left);
+    right_front.setReversed(right);
+    right_back.setReversed(right);
     
-    LeftFront.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
-    LeftBack.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
-    RightFront.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
-    RightBack.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
+    left_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    left_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    right_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    right_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
     
-    LeftFront.stop();
-    LeftBack.stop();
-    RightFront.stop();
-    RightBack.stop();    
+    left_front.stop();
+    left_back.stop();
+    right_front.stop();
+    right_back.stop();    
 }
 
 void rotate(bool reverse, double inches, double percent, bool asynchronous) {
     
-    double degPerInch = 27;//28.64 is actual
-    double rotationGoal = degPerInch*inches;
+    double degrees_per_inch = 27;//28.64 is actual
+    double rotation_goal = degrees_per_inch*inches;
     
-    LeftFront.setReversed(reverse);
-    LeftBack.setReversed(reverse);
-    RightFront.setReversed(reverse);
-    RightBack.setReversed(reverse);
+    left_front.setReversed(reverse);
+    left_back.setReversed(reverse);
+    right_front.setReversed(reverse);
+    right_back.setReversed(reverse);
     
-    LeftFront.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
-    LeftBack.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
-    RightFront.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
-    RightBack.rotateFor(rotationGoal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
+    left_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    left_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    right_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    right_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
     
-    LeftFront.stop();
-    LeftBack.stop();
-    RightFront.stop();
-    RightBack.stop();    
+    left_front.stop();
+    left_back.stop();
+    right_front.stop();
+    right_back.stop();    
 }
 
 int shoot() {
     int goal = Brain.timer(vex::timeUnits::sec)+promise;
     while(1) {
-        if (getFlywheelRPM() > 175) {
-            Intake.setReversed(false);
-            Intake.rotateFor(1360, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+        if (get_flywheel_rpm() > 175) {
+            ball_intake.setReversed(false);
+            ball_intake.rotateFor(1360, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
             return -1;
         }   
         if(Brain.timer(vex::timeUnits::sec) > goal) {
@@ -105,26 +103,26 @@ void auton0( void ) {
 
 void auton1( void ) {
     //RED FRONT AUTON
-    Flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+    flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
 
     //ALIGN WITH WALL AND MOVE BACK INTO EXPANSION ZONE TO LOWER ARM
     move(false, 56, 100, true);
     move(true, 56, 100, true);
-    Arm.rotateFor(-210, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
-    Arm.stop(vex::brakeType::coast);
+    arm.rotateFor(-210, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
+    arm.stop(vex::brakeType::coast);
 
     //MOVE INTO POSITION, SHOOT FLAG, AND STOP FLYWHEEL
     move(false, 36, 100, true);
     shoot();
-    Flywheel.stop(vex::brakeType::coast);
+    flywheel.stop(vex::brakeType::coast);
 
     //TURN 90 DEGREES, MOVE FORWARD, AND FLIP CAP
     rotate(false, 17, 100, true);  
     move(true, 10, 100, true);
     move(false, 38, 100, true);
 
-    Arm.rotateFor(50, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
-    Arm.stop(vex::brakeType::coast);
+    arm.rotateFor(50, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
+    arm.stop(vex::brakeType::coast);
     move(true, 11, 100, true);
 
     //TURN TOWARDS PLATFORM AND PARK
@@ -152,12 +150,12 @@ void auton3( void ) {
 }
 
 void auton4( void ) {
-    Flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+    flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
         
     move(false, 24, 100, true);
     shoot();
 
-    Flywheel.stop(vex::brakeType::coast);
+    flywheel.stop(vex::brakeType::coast);
     move(true, 24, 100, true);
     
     Brain.Screen.clearScreen(vex::color::white);
@@ -182,26 +180,26 @@ void auton6( void ) {
 
 void auton7( void ) {
     //BLUE FRONT AUTON
-    Flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+    flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
 
     //ALIGN WITH WALL AND MOVE BACK INTO EXPANSION ZONE TO LOWER ARM
     move(false, 56, 100, true);
     move(true, 56, 100, true);
-    Arm.rotateFor(-210, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
-    Arm.stop(vex::brakeType::coast);
+    arm.rotateFor(-210, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
+    arm.stop(vex::brakeType::coast);
 
     //MOVE INTO POSITION, SHOOT FLAG, AND STOP FLYWHEEL
     move(false, 36, 100, true);
     shoot();
-    Flywheel.stop(vex::brakeType::coast);
+    flywheel.stop(vex::brakeType::coast);
 
     //TURN 90 DEGREES, MOVE FORWARD, AND FLIP CAP
     rotate(true, 17, 100, true);  
     move(true, 10, 100, true);
     move(false, 38, 100, true);
 
-    Arm.rotateFor(50, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
-    Arm.stop(vex::brakeType::coast);
+    arm.rotateFor(50, vex::rotationUnits::deg, 80, vex::velocityUnits::pct);
+    arm.stop(vex::brakeType::coast);
     move(true, 11, 100, true);
 
     //TURN TOWARDS PLATFORM AND PARK
@@ -229,12 +227,12 @@ void auton9( void ) {
 }
 
 void auton10( void ) {
-    Flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+    flywheel.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
 
     move(false, 24, 100, true);
     shoot();
 
-    Flywheel.stop(vex::brakeType::coast);
+    flywheel.stop(vex::brakeType::coast);
     move(true, 24, 100, true);
     
     Brain.Screen.clearScreen(vex::color::white);
@@ -265,13 +263,13 @@ void screens(int screen) {
         Brain.Screen.setPenColor(vex::color::black);
         Brain.Screen.setPenWidth(2);
         
-        yDisplacement = 0;
-        xDisplacement = 120;
-        x = xDisplacement;
-        y = yDisplacement;
+        y_displacement = 0;
+        x_displacement = 120;
+        x = x_displacement;
+        y = y_displacement;
         
         for (int i = 0; i < tiles; i++) {
-            x = xDisplacement;
+            x = x_displacement;
             for (int j = 0; j < tiles; j++) {
                 Brain.Screen.drawRectangle(x, y, tile_px, tile_px, "#838383");
                 x += tile_px;
@@ -324,7 +322,7 @@ void screens(int screen) {
         
         for(int i = 0; i < 8; i++) {
             Brain.Screen.setPenColor(caps[i][1][0]);
-            Brain.Screen.drawCircle(caps[i][0][0]+xDisplacement, caps[i][0][1]+yDisplacement, capsRadiusPX, caps[i][1][1]);
+            Brain.Screen.drawCircle(caps[i][0][0]+x_displacement, caps[i][0][1]+y_displacement, capsRadiusPX, caps[i][1][1]);
         }
         
         for(int i = 0; i < 4; i++) {
@@ -332,78 +330,78 @@ void screens(int screen) {
             int width = buttons[i][1][1] - buttons[i][1][0];
 
             Brain.Screen.setPenColor(buttons[i][2][0]);
-            Brain.Screen.drawRectangle(buttons[i][0][0]+xDisplacement, buttons[i][1][0]+yDisplacement, width, length, buttons[i][2][1]);
+            Brain.Screen.drawRectangle(buttons[i][0][0]+x_displacement, buttons[i][1][0]+y_displacement, width, length, buttons[i][2][1]);
         }
         
         //Expansion Zone
         Brain.Screen.setPenColor(vex::color::white);
         Brain.Screen.setPenWidth(2);
-        Brain.Screen.drawLine(0+xDisplacement, 120+yDisplacement, 40+xDisplacement, 120+yDisplacement);
-        Brain.Screen.drawLine(200+xDisplacement, 120+yDisplacement, 240+xDisplacement, 120+yDisplacement);
-        Brain.Screen.drawLine(40+xDisplacement, 120+yDisplacement, 40+xDisplacement, 200+yDisplacement);
-        Brain.Screen.drawLine(200+xDisplacement, 120+yDisplacement, 200+xDisplacement, 200+yDisplacement);
+        Brain.Screen.drawLine(0+x_displacement, 120+y_displacement, 40+x_displacement, 120+y_displacement);
+        Brain.Screen.drawLine(200+x_displacement, 120+y_displacement, 240+x_displacement, 120+y_displacement);
+        Brain.Screen.drawLine(40+x_displacement, 120+y_displacement, 40+x_displacement, 200+y_displacement);
+        Brain.Screen.drawLine(200+x_displacement, 120+y_displacement, 200+x_displacement, 200+y_displacement);
         
-        Brain.Screen.drawLine(40+xDisplacement, 200+yDisplacement, 200+xDisplacement, 200+yDisplacement);
-        Brain.Screen.drawLine(120+xDisplacement, 240+yDisplacement, 120+xDisplacement, 0+yDisplacement);
+        Brain.Screen.drawLine(40+x_displacement, 200+y_displacement, 200+x_displacement, 200+y_displacement);
+        Brain.Screen.drawLine(120+x_displacement, 240+y_displacement, 120+x_displacement, 0+y_displacement);
         
         //Flag Pole
         Brain.Screen.setPenColor(vex::color::black);
         Brain.Screen.setPenWidth(7);
-        Brain.Screen.drawLine(0+xDisplacement, 0+yDisplacement, 0+xDisplacement, 40+yDisplacement);
-        Brain.Screen.drawLine(0+xDisplacement, 0+yDisplacement, 240+xDisplacement, 0+yDisplacement);
-        Brain.Screen.drawLine(240+xDisplacement, 0+yDisplacement, 240+xDisplacement, 40+yDisplacement);
-        Brain.Screen.drawLine(40+xDisplacement, 0+yDisplacement, 40+xDisplacement, 20+yDisplacement);
-        Brain.Screen.drawLine(120+xDisplacement, 0+yDisplacement, 120+xDisplacement, 20+yDisplacement);
-        Brain.Screen.drawLine(200+xDisplacement, 0+yDisplacement, 200+xDisplacement, 20+yDisplacement);
+        Brain.Screen.drawLine(0+x_displacement, 0+y_displacement, 0+x_displacement, 40+y_displacement);
+        Brain.Screen.drawLine(0+x_displacement, 0+y_displacement, 240+x_displacement, 0+y_displacement);
+        Brain.Screen.drawLine(240+x_displacement, 0+y_displacement, 240+x_displacement, 40+y_displacement);
+        Brain.Screen.drawLine(40+x_displacement, 0+y_displacement, 40+x_displacement, 20+y_displacement);
+        Brain.Screen.drawLine(120+x_displacement, 0+y_displacement, 120+x_displacement, 20+y_displacement);
+        Brain.Screen.drawLine(200+x_displacement, 0+y_displacement, 200+x_displacement, 20+y_displacement);
         
         //Flags
         Brain.Screen.setPenWidth(3);
         Brain.Screen.setPenColor(vex::color::red);
-        Brain.Screen.drawLine(120+xDisplacement, 20+yDisplacement, 134+xDisplacement, 6+yDisplacement);
-        Brain.Screen.drawLine(200+xDisplacement, 20+yDisplacement, 220+xDisplacement, 20+yDisplacement);
+        Brain.Screen.drawLine(120+x_displacement, 20+y_displacement, 134+x_displacement, 6+y_displacement);
+        Brain.Screen.drawLine(200+x_displacement, 20+y_displacement, 220+x_displacement, 20+y_displacement);
         
         Brain.Screen.setPenColor(vex::color::blue);
-        Brain.Screen.drawLine(40+xDisplacement, 20+yDisplacement, 20+xDisplacement, 20+yDisplacement);
-        Brain.Screen.drawLine(120+xDisplacement, 20+yDisplacement, 106+xDisplacement, 6+yDisplacement);
+        Brain.Screen.drawLine(40+x_displacement, 20+y_displacement, 20+x_displacement, 20+y_displacement);
+        Brain.Screen.drawLine(120+x_displacement, 20+y_displacement, 106+x_displacement, 6+y_displacement);
         
         for(int i = 0; i < 3; i++) {
             int length = platforms[i][0][1] - platforms[i][0][0];
             int width = platforms[i][1][1] - platforms[i][1][0];
 
             Brain.Screen.setPenColor(platforms[i][2][0]);
-            Brain.Screen.drawRectangle(platforms[i][0][0]+xDisplacement, platforms[i][1][0]+yDisplacement, width, length, platforms[i][2][1]);
+            Brain.Screen.drawRectangle(platforms[i][0][0]+x_displacement, platforms[i][1][0]+y_displacement, width, length, platforms[i][2][1]);
         }
         
         for(int i = 0; i < 16; i++) {
             Brain.Screen.setPenColor(balls[i][1][0]);
-            Brain.Screen.drawCircle(balls[i][0][0]+xDisplacement, balls[i][0][1]+yDisplacement, ballsRadiusPX, balls[i][1][1]);
+            Brain.Screen.drawCircle(balls[i][0][0]+x_displacement, balls[i][0][1]+y_displacement, ballsRadiusPX, balls[i][1][1]);
         }
         
-        buttonPressed = 0;
-        while (buttonPressed == 0) {
+        button_pressed = 0;
+        while (button_pressed == 0) {
             for(int i = 0; i < 4; i++) {
-                if(((Brain.Screen.xPosition() > buttons[i][0][0]+xDisplacement) && 
-                    (Brain.Screen.xPosition() < buttons[i][0][1]+xDisplacement)) && 
-                   ((Brain.Screen.yPosition() > buttons[i][1][0]+yDisplacement && 
-                     Brain.Screen.yPosition() < buttons[i][1][1]+yDisplacement)) &&
+                if(((Brain.Screen.xPosition() > buttons[i][0][0]+x_displacement) && 
+                    (Brain.Screen.xPosition() < buttons[i][0][1]+x_displacement)) && 
+                   ((Brain.Screen.yPosition() > buttons[i][1][0]+y_displacement && 
+                     Brain.Screen.yPosition() < buttons[i][1][1]+y_displacement)) &&
                    Brain.Screen.pressing()) {
                     vex::task::sleep(1000); //or add wait until function...
-                    buttonPressed = i+1;
+                    button_pressed = i+1;
                 }
             }
             vex::task::sleep(25);
         }
         
-        if (buttonPressed == 1) {
+        if (button_pressed == 1) {
             red = true;
             front = true;
-        } else if (buttonPressed == 2) {
+        } else if (button_pressed == 2) {
             red = true;
             front = false;
-        } else if (buttonPressed == 3) {
+        } else if (button_pressed == 3) {
             red = false;
             front = true;
-        } else if (buttonPressed == 4) {
+        } else if (button_pressed == 4) {
             red = false;
             front = false;
         }
@@ -463,8 +461,8 @@ void screens(int screen) {
         Brain.Screen.setFillColor(vex::color::white);
         Brain.Screen.print("Back");
         
-        buttonPressed = 0;
-        while (buttonPressed == 0) {
+        button_pressed = 0;
+        while (button_pressed == 0) {
             for(int i = 0; i < 4; i++) {
                 if(((Brain.Screen.xPosition() > buttons[i][0][0]) && 
                     (Brain.Screen.xPosition() < buttons[i][0][1])) && 
@@ -472,47 +470,47 @@ void screens(int screen) {
                      Brain.Screen.yPosition() < buttons[i][1][1])) &&
                    Brain.Screen.pressing()) {
                     vex::task::sleep(1000); //or add wait until function...
-                    buttonPressed = i+1;
+                    button_pressed = i+1;
                 }
             }
             vex::task::sleep(25);
         }
         
-        if (buttonPressed == 4) {
+        if (button_pressed == 4) {
             screens(1);
         } else if (red) {
             if (front) {
-                if (buttonPressed == 1) {
+                if (button_pressed == 1) {
                     auton = 1;
-                } else if (buttonPressed == 2) {
+                } else if (button_pressed == 2) {
                     auton = 2;
-                } else if (buttonPressed == 3) {
+                } else if (button_pressed == 3) {
                     auton = 3;
                 }
             } else {
-                if (buttonPressed == 1) {
+                if (button_pressed == 1) {
                     auton = 4;
-                } else if (buttonPressed == 2) {
+                } else if (button_pressed == 2) {
                     auton = 5;
-                } else if (buttonPressed == 3) {
+                } else if (button_pressed == 3) {
                     auton = 6;
                 }
             }
         } else  {
             if (front) {
-                if (buttonPressed == 1) {
+                if (button_pressed == 1) {
                     auton = 7;
-                } else if (buttonPressed == 2) {
+                } else if (button_pressed == 2) {
                     auton = 8;
-                } else if (buttonPressed == 3) {
+                } else if (button_pressed == 3) {
                     auton = 9;
                 }
             } else {
-                if (buttonPressed == 1) {
+                if (button_pressed == 1) {
                     auton = 10;
-                } else if (buttonPressed == 2) {
+                } else if (button_pressed == 2) {
                     auton = 11;
-                } else if (buttonPressed == 3) {
+                } else if (button_pressed == 3) {
                     auton = 12;
                 }
             }
@@ -585,8 +583,8 @@ void screens(int screen) {
         Brain.Screen.setFillColor(vex::color::white);
         Brain.Screen.print("Back");
         
-        buttonPressed = 0;
-        while (buttonPressed == 0) {
+        button_pressed = 0;
+        while (button_pressed == 0) {
             for(int i = 0; i < 1; i++) {
                 if(((Brain.Screen.xPosition() > buttons[i][0][0]) && 
                     (Brain.Screen.xPosition() < buttons[i][0][1])) && 
@@ -595,7 +593,7 @@ void screens(int screen) {
                    Brain.Screen.pressing()) {
                     vex::task::sleep(1000); //or add wait until function...
                     screens(2);
-                    buttonPressed = i+1;
+                    button_pressed = i+1;
                 }
             }
             vex::task::sleep(25);
@@ -644,58 +642,58 @@ void autonomous( void ) {
 }
 
 void usercontrol( void ) {
-    LeftFront.setReversed(true);
-    LeftBack.setReversed(true);
-    RightFront.setReversed(true);
-    RightBack.setReversed(true);
-    Arm.setReversed(false);
+    left_front.setReversed(true);
+    left_back.setReversed(true);
+    right_front.setReversed(true);
+    right_back.setReversed(true);
+    arm.setReversed(false);
     vex::thread controllerPrint_t(controllerPrint);
     vex::thread controllerVibrate_t(controllerVibrate);
 
     while(true) {
 
        //Drive Control
-      LeftFront.spin(vex::directionType::rev, Controller.Axis3.value()*0.75, vex::velocityUnits::pct);
-      LeftBack.spin(vex::directionType::rev, Controller.Axis3.value()*0.75, vex::velocityUnits::pct);
-      RightFront.spin(vex::directionType::fwd, Controller.Axis2.value()*0.75, vex::velocityUnits::pct);
-      RightBack.spin(vex::directionType::fwd, Controller.Axis2.value()*0.75, vex::velocityUnits::pct);
+      left_front.spin(vex::directionType::rev, controller.Axis3.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
+      left_back.spin(vex::directionType::rev, controller.Axis3.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
+      right_front.spin(vex::directionType::fwd, controller.Axis2.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
+      right_back.spin(vex::directionType::fwd, controller.Axis2.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
 
       //Flywheel Control
-      if(Controller.ButtonA.pressing()) { //If button A is pressed...
-          Flywheel.spin(vex::directionType::rev, flySpeedPCT, vex::velocityUnits::pct);
+      if(controller.ButtonA.pressing()) { //If button A is pressed...
+          flywheel.spin(vex::directionType::rev, flywheel_speed_percentage, vex::velocityUnits::pct);
       }
       else {
-          if (getFlywheelRPM() < (flySpeedPCT/2))
+          if (get_flywheel_rpm() < (flywheel_speed_percentage/2))
           {
-              Flywheel.spin(vex::directionType::rev, flySpeedPCT/4, vex::velocityUnits::pct);
+              flywheel.spin(vex::directionType::rev, flywheel_speed_percentage/4, vex::velocityUnits::pct);
           } else {
-              Flywheel.stop(vex::brakeType::coast);
+              flywheel.stop(vex::brakeType::coast);
           }
       }
 
-      //Intake Control
-      if(Controller.ButtonL1.pressing()) {
-          Intake.spin(vex::directionType::rev, intakeSpeedPCT, vex::velocityUnits::pct);
-      } else if(Controller.ButtonL2.pressing()) {
-          Intake.spin(vex::directionType::fwd, intakeSpeedPCT, vex::velocityUnits::pct);
+      //Ball Intake Control
+      if(controller.ButtonL1.pressing()) {
+          ball_intake.spin(vex::directionType::rev, ball_intake_speed_percentage, vex::velocityUnits::pct);
+      } else if(controller.ButtonL2.pressing()) {
+          ball_intake.spin(vex::directionType::fwd, ball_intake_speed_percentage, vex::velocityUnits::pct);
       } else {
-          Intake.stop(vex::brakeType::brake);       
+          ball_intake.stop(vex::brakeType::brake);       
       }
 
       //Arm Control
-      if(Controller.ButtonR1.pressing()) {
-          Arm.spin(vex::directionType::fwd, armSpeedPCT, vex::velocityUnits::pct);
-      } else if(Controller.ButtonR2.pressing()) {
-          Arm.spin(vex::directionType::rev, armSpeedPCT, vex::velocityUnits::pct);
+      if(controller.ButtonR1.pressing()) {
+          arm.spin(vex::directionType::fwd, arm_speed_percentage, vex::velocityUnits::pct);
+      } else if(controller.ButtonR2.pressing()) {
+          arm.spin(vex::directionType::rev, arm_speed_percentage, vex::velocityUnits::pct);
       } else {
-          Arm.stop(vex::brakeType::brake);       
+          arm.stop(vex::brakeType::brake);       
       }
 
-      //Claw Control
-      if(Controller.ButtonB.pressing()) {
-          Claw.spin(vex::directionType::fwd, armSpeedPCT, vex::velocityUnits::pct);
+      //Cap Intake Control
+      if(controller.ButtonB.pressing()) {
+          cap_intake.spin(vex::directionType::fwd, arm_speed_percentage, vex::velocityUnits::pct);
       } else {
-          Claw.stop(vex::brakeType::brake);
+          cap_intake.stop(vex::brakeType::brake);
       }
 
       vex::task::sleep(20);
@@ -705,8 +703,8 @@ void usercontrol( void ) {
 int main() {
     pre_auton();
     
-    Competition.autonomous( autonomous );
-    Competition.drivercontrol( usercontrol );
+    competition.autonomous( autonomous );
+    competition.drivercontrol( usercontrol );
     
     while(1) {
         vex::task::sleep(25);
