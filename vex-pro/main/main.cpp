@@ -649,14 +649,14 @@ void usercontrol( void ) {
     arm.setReversed(false);
     vex::thread controller_print_t(controller_print);
     vex::thread controller_vibrate_t(controller_vibrate);
-
+    
     while(true) {
 
       //Drive Control
-      left_front.spin(vex::directionType::rev, controller.Axis3.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
-      left_back.spin(vex::directionType::rev, controller.Axis3.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
-      right_front.spin(vex::directionType::fwd, controller.Axis2.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
-      right_back.spin(vex::directionType::fwd, controller.Axis2.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
+      left_front.spin(vex::directionType::rev, controller.Axis3.value()*0.75, vex::velocityUnits::pct);
+      left_back.spin(vex::directionType::rev, controller.Axis3.value()*0.75, vex::velocityUnits::pct);
+      right_front.spin(vex::directionType::fwd, controller.Axis2.value()*0.75, vex::velocityUnits::pct);
+      right_back.spin(vex::directionType::fwd, controller.Axis2.value()*0.75, vex::velocityUnits::pct);
 
       //Flywheel Control
       if(controller.ButtonA.pressing()) { //If button A is pressed...

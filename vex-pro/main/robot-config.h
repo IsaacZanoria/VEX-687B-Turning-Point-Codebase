@@ -13,7 +13,6 @@ vex::controller controller(vex::controllerType::primary);
 
 vex::competition  competition;
 
-int drive_speed_percentage = 75;
 int flywheel_speed_percentage = 100;
 int flywheel_rest_speed_threshold_percentage = 30;
 int ball_intake_speed_percentage = 100;
