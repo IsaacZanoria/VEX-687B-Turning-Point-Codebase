@@ -6,10 +6,10 @@ bool red;
 bool front;
 int auton = 0;
 
-int promise = 4;
+int promise = 6;
 
 int get_flywheel_rpm(){
-    return Flywheel.velocity(vex::velocityUnits::rpm)*-1;
+    return flywheel.velocity(vex::velocityUnits::rpm)*-1;
 }
 
 void controller_print(){
@@ -22,7 +22,7 @@ void controller_print(){
 
 void controller_vibrate(){
     while(1){
-        if (get_flywheel_rpm() > 170){
+        if (get_flywheel_rpm() > 170) {
             controller.rumble("-");
         }
     }
@@ -647,12 +647,12 @@ void usercontrol( void ) {
     right_front.setReversed(true);
     right_back.setReversed(true);
     arm.setReversed(false);
-    vex::thread controllerPrint_t(controllerPrint);
-    vex::thread controllerVibrate_t(controllerVibrate);
+    vex::thread controller_print_t(controller_print);
+    vex::thread controller_vibrate_t(controller_vibrate);
 
     while(true) {
 
-       //Drive Control
+      //Drive Control
       left_front.spin(vex::directionType::rev, controller.Axis3.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
       left_back.spin(vex::directionType::rev, controller.Axis3.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
       right_front.spin(vex::directionType::fwd, controller.Axis2.value()*(drive_speed_percentage/100), vex::velocityUnits::pct);
@@ -663,9 +663,9 @@ void usercontrol( void ) {
           flywheel.spin(vex::directionType::rev, flywheel_speed_percentage, vex::velocityUnits::pct);
       }
       else {
-          if (get_flywheel_rpm() < (flywheel_speed_percentage/2))
+          if (get_flywheel_rpm() < flywheel_rest_speed_threshold_percentage*2)
           {
-              flywheel.spin(vex::directionType::rev, flywheel_speed_percentage/4, vex::velocityUnits::pct);
+              flywheel.spin(vex::directionType::rev, flywheel_rest_speed_threshold_percentage/2, vex::velocityUnits::pct);
           } else {
               flywheel.stop(vex::brakeType::coast);
           }
