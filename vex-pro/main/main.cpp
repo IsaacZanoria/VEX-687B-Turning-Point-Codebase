@@ -95,6 +95,7 @@ int shoot() {
 }
 
 void auton0( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -129,6 +130,7 @@ void auton1( void ) {
     rotate(false, 51, 100, true);
     move(true, 48, 100, true);
     
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -136,6 +138,8 @@ void auton1( void ) {
 }
 
 void auton2( void ) {
+    
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -143,6 +147,8 @@ void auton2( void ) {
 }
 
 void auton3( void ) {
+    
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -157,7 +163,7 @@ void auton4( void ) {
 
     flywheel.stop(vex::brakeType::coast);
     move(true, 24, 100, true);
-    
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -165,6 +171,7 @@ void auton4( void ) {
 }
 
 void auton5( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -172,6 +179,7 @@ void auton5( void ) {
 }
 
 void auton6( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -206,6 +214,7 @@ void auton7( void ) {
     rotate(true, 51, 100, true);
     move(true, 48, 100, true);
     
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -213,6 +222,7 @@ void auton7( void ) {
 }
 
 void auton8( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -220,6 +230,7 @@ void auton8( void ) {
 }
 
 void auton9( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -235,6 +246,7 @@ void auton10( void ) {
     flywheel.stop(vex::brakeType::coast);
     move(true, 24, 100, true);
     
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -242,6 +254,7 @@ void auton10( void ) {
 }
 
 void auton11( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -249,6 +262,7 @@ void auton11( void ) {
 }
 
 void auton12( void ) {
+    Brain.Screen.setFillColor(vex::color::white);
     Brain.Screen.clearScreen(vex::color::white);
     Brain.Screen.setPenColor(vex::color::black);
     Brain.Screen.setCursor(1, 1);
@@ -520,6 +534,7 @@ void screens(int screen) {
     } else if (screen == 3) {
         Brain.Screen.clearScreen(vex::color::white);
         Brain.Screen.setPenColor(vex::color::black);
+        Brain.Screen.setFillColor(vex::color::white);
         Brain.Screen.setPenWidth(2);
         Brain.Screen.setFont(vex::fontType::mono20);
         
@@ -646,7 +661,7 @@ void usercontrol( void ) {
     left_back.setReversed(true);
     right_front.setReversed(true);
     right_back.setReversed(true);
-    arm.setReversed(false);
+    arm.setReversed(true);
     vex::thread controller_print_t(controller_print);
     vex::thread controller_vibrate_t(controller_vibrate);
     
@@ -701,12 +716,16 @@ void usercontrol( void ) {
 }
 
 int main() {
-    pre_auton();
-    
-    competition.autonomous( autonomous );
-    competition.drivercontrol( usercontrol );
-    
-    while(1) {
-        vex::task::sleep(25);
+    while (true) {
+        pre_auton();
+
+        if(!competition.isCompetitionSwitch()) {
+            usercontrol();
+        }
+
+        competition.autonomous( autonomous );
+        competition.drivercontrol( usercontrol );
+
+        vex::task::sleep(1000);
     }
 }
