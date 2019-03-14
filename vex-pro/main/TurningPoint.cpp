@@ -8,15 +8,17 @@
 //#region config_globals
 vex::brain Brain;
 vex::controller Controller(vex::controllerType::primary);
+vex::pot pot_flipper(Brain.ThreeWirePort.C);
 vex::pot pot_arm(Brain.ThreeWirePort.A);
-vex::motor motor_left_front(vex::PORT1, vex::gearSetting::ratio18_1, false);
-vex::motor motor_left_back(vex::PORT2, vex::gearSetting::ratio18_1, false);
-vex::motor motor_right_front(vex::PORT3, vex::gearSetting::ratio18_1, true);
-vex::motor motor_right_back(vex::PORT4, vex::gearSetting::ratio18_1, true);
-vex::motor motor_intake(vex::PORT5, vex::gearSetting::ratio18_1, false);
-vex::motor motor_flipper(vex::PORT6, vex::gearSetting::ratio18_1, false);
-vex::motor motor_arm(vex::PORT7, vex::gearSetting::ratio18_1, false);
-vex::motor motor_catapult(vex::PORT8, vex::gearSetting::ratio18_1, false);
+vex::pot pot_catapult(Brain.ThreeWirePort.B);
+vex::motor motor_left_front(vex::PORT19, vex::gearSetting::ratio18_1, false);
+vex::motor motor_left_back(vex::PORT20, vex::gearSetting::ratio18_1, false);
+vex::motor motor_right_front(vex::PORT17, vex::gearSetting::ratio18_1, true);
+vex::motor motor_right_back(vex::PORT16, vex::gearSetting::ratio18_1, true);
+vex::motor motor_intake(vex::PORT15, vex::gearSetting::ratio18_1, true);
+vex::motor motor_flipper(vex::PORT9, vex::gearSetting::ratio18_1, false);
+vex::motor motor_arm(vex::PORT10, vex::gearSetting::ratio18_1, true);
+vex::motor motor_catapult(vex::PORT18, vex::gearSetting::ratio18_1, false);
 //#endregion config_globals
 
 // Creates a competition object that allows access to Competition methods.
@@ -26,11 +28,11 @@ std::string side = "none";
 std::string position = "none";
 int screen_id = 1;
 bool first_run = true;
+bool auton = false;
 
-//Move function for auton (forward/reverse)
 void move(bool reverse, double inches, double percent, bool asynchronous) {
     
-    double degrees_per_inch = 27;//28.64 is actual (need to multiply by gear ratio)
+    double degrees_per_inch = 40; // 27 //28.64 is actual (need to multiply by gear ratio)
     double rotation_goal = degrees_per_inch*inches;
     
     bool left;
@@ -52,12 +54,16 @@ void move(bool reverse, double inches, double percent, bool asynchronous) {
     motor_left_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_right_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_right_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
+    
+    motor_left_front.stop(vex::brakeType::brake);
+    motor_left_back.stop(vex::brakeType::brake);
+    motor_right_front.stop(vex::brakeType::brake);
+    motor_right_back.stop(vex::brakeType::brake);
 }
 
-//Rotate function for auton (left/right)
-void rotate(bool reverse, double inches, double percent, bool asynchronous) {
+void rotate(bool reverse, double inches, double percent, bool asynchronous) { // inches = 17 :: 90 DEGS
     
-    double degrees_per_inch = 27;//28.64 is actual (need to multiply by gear ratio)
+    double degrees_per_inch = 40;//28.64 is actual (need to multiply by gear ratio)
     double rotation_goal = degrees_per_inch*inches;
     
     motor_left_front.setReversed(reverse);
@@ -71,43 +77,127 @@ void rotate(bool reverse, double inches, double percent, bool asynchronous) {
     motor_right_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
 }
 
-void auton_1(bool park) {
-    //None
+void setup_catapult() {
+    while (pot_catapult.value(vex::analogUnits::range12bit) == 0) {
+        vex::this_thread::sleep_for(50);
+        //wait
+    }
+    
+    while (pot_catapult.value(vex::analogUnits::range12bit) > 275 || pot_catapult.value(vex::analogUnits::range12bit) < 75) {//Launch angle
+        motor_catapult.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    }
+    motor_catapult.stop(vex::brakeType::brake);
 }
 
-void auton_2(bool park) {
-    //AUTON WIP
-    
-    if (park) {
-        
+bool available_catapult = true;
+void launch_catapult() {
+    if (available_catapult) {
+        available_catapult = false;
+        motor_catapult.rotateFor(vex::directionType::fwd, 600, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+        vex::this_thread::sleep_for(1500);
+        setup_catapult();
+        motor_catapult.stop(vex::brakeType::brake);
+        available_catapult = true;
     }
 }
 
-void auton_3(bool park) {
-    //AUTON WIP
-    
-    if (park) {
-        
+bool available_flipper = true;
+void rotate_flipper() {
+    if (available_flipper) {
+        available_flipper = false;
+        motor_flipper.rotateFor(vex::directionType::fwd, 450, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+        available_flipper = true;
+        motor_flipper.stop(vex::brakeType::brake);
     }
 }
 
-void auton_4(bool park) {
-    //AUTON WIP
-    
-    if (park) {
-        
-    }
+void auton_1() {
+    //NONE
 }
 
-void auton_5(bool park) {
-    //AUTON WIP
+void auton_2() {
+    //RED NEAR
     
-    if (park) {
-        
-    }
+    //drive forward and hit the wall
+    move(false, 50, 100, true);
+    
+    move(true, 25, 100, true);
+    
+    //setup and shoot
+    setup_catapult();
+    launch_catapult();
+    
+    rotate(true, 5, 100, true);
+    move(false, 5, 50, true);
+    rotate(true, 15, 100, true);
+    move(true, 15, 50, true);
+    
+    move(false, 15, 100, true);
 }
 
-//Button Data
+void auton_3() {
+    //RED FAR
+    motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+    
+    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    
+    move(false, 24, 100, true);
+    
+    move(true, 24, 100, true);
+    
+    motor_intake.stop(vex::brakeType::brake);
+}
+
+void auton_4() {
+    //BLUE NEAR
+    //drive forward and hit the wall
+    move(false, 50, 100, true);
+    
+    //drive backwards (more)
+    move(true, 80, 100, true);
+    
+    motor_arm.rotateFor(vex::directionType::rev, 3500, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+    
+    //drive forwards (less)
+    move(false, 45, 100, true);
+    
+    //setup and shoot
+    setup_catapult();
+    launch_catapult();
+    launch_catapult();
+}
+
+void auton_5() {
+    //BLUE FAR
+    motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+    
+    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    
+    move(false, 24, 100, true);
+    
+    move(true, 24, 100, true);
+    
+    motor_intake.stop(vex::brakeType::brake);
+}
+
+void autonomous() {
+    auton = true;
+    first_run = false;
+    // Place autonomous code here
+    if (side == "none" && position == "none") {
+        vex::thread auton_thread_1 (auton_1);
+    } else if (side == "red" && position == "near") {
+        vex::thread auton_thread_2 (auton_2);
+    } else if (side == "red" && position == "far") {
+        vex::thread auton_thread_3 (auton_3);
+    } else if (side == "blue" && position == "near") {
+        vex::thread auton_thread_4 (auton_4);
+    } else if (side == "blue" && position == "far") {
+        vex::thread auton_thread_5 (auton_5);
+    }
+    screen_id = 6;
+}
+
 class Button {
 private:
     int get_pressed_xpos() {
@@ -194,8 +284,7 @@ public:
         return false;
     }
 };
-
-//Snowflake Data
+ 
 int max_drop_size = 5;
 int min_drop_size = 2;
 int drop_speed = 1;
@@ -212,7 +301,6 @@ public:
     }
 };
 
-//Snowflake animations and updates
 class Snowflake {
 public:
     std::vector<Drop> drops;
@@ -246,27 +334,6 @@ public:
     }
 };
 
-//Run auton
-void autonomous() {
-    // Place autonomous code here
-    if (side == "none" && position == "none") {
-        auton_1(false);
-    } else if (side == "red" && position == "near") {
-        auton_2(false);
-    } else if (side == "red" && position == "far") {
-        auton_3(false);
-    } else if (side == "blue" && position == "near") {
-        auton_4(false);
-    } else if (side == "blue" && position == "far") {
-        auton_5(false);
-    }
-    screen_id = 6;
-}
-
-//LCD Visuals
-// - Frame-tick output
-// - Refresh based on MSEC/FRAME
-// - All screens located here
 class Screen {
 private:
     static constexpr int milliseconds_per_frame = 17; //17: 60fps || 33: 30fps
@@ -629,7 +696,8 @@ private:
         b_back.set(480 / 2 - 80 / 2 + 140, 35, 80, 40);
         if (b_back.pressing()) {
             while (b_back.pressing()) {
-                
+                autonomous();
+                auton = true;
             }
             if (b_back.pressed()) {
                 screen_id = 2;
@@ -825,19 +893,19 @@ void pre_auton() {
     vex::thread screen_thread(run_screen);
 }
 
-double drive_speed = 0.75;
+double drive_speed = 1.00;
 double intake_speed = 1.00;
 double flipper_speed = 1.00;
+double arm_speed = 1.00;
 double catapult_speed = 1.00;
 void drivercontrol() {
-    if (first_run) {
-        first_run = false;
-    } else {
+    auton = false;
+    if (!first_run) {
         screen_id = 7;
     }
-    
     // Place drive control code here, inside the loop
-    while (true) {
+    while (!auton) {
+        //std::cout << "driver running \t" << Brain.Timer.time() << std::endl; 
         // This is the main loop for the driver control.
         // Each time through the loop you should update motor
         // movements based on input from the controller.
@@ -848,47 +916,65 @@ void drivercontrol() {
         motor_right_back.spin(vex::directionType::fwd, Controller.Axis2.position(vex::percentUnits::pct), vex::velocityUnits::pct);
     
         //Intake
-        if (Controller.ButtonL2.pressing()) {
-            motor_intake.spin(vex::directionType::fwd, 100 * intake_speed, vex::percentUnits::pct);
-        } else if (Controller.ButtonL1.pressing()) {
-            motor_intake.spin(vex::directionType::rev, 100 * intake_speed, vex::percentUnits::pct);
+        if(Controller.ButtonL1.pressing()) {
+            motor_intake.spin(vex::directionType::fwd, 100 * intake_speed, vex::velocityUnits::pct);
+        } else if(Controller.ButtonL2.pressing()) {
+            motor_intake.spin(vex::directionType::rev, 100 * intake_speed, vex::velocityUnits::pct);
         } else {
-            motor_intake.stop(vex::brakeType::brake);
+            motor_intake.stop(vex::brakeType::brake);       
         }
         
-        //Flipper
-        if (Controller.ButtonY.pressing()) {
-            if (motor_flipper.isDone()) {
-                motor_flipper.rotateFor(vex::directionType::fwd, 180 * ( 3 / 2 ), vex::rotationUnits::deg, 100 * catapult_speed, vex::velocityUnits::pct);
+        if (!((Controller.ButtonR1.pressing() && Controller.ButtonY.pressing()) || (Controller.ButtonR2.pressing() && Controller.ButtonY.pressing()))) {
+            //Flipper
+            if (Controller.ButtonY.pressing()) {
+                vex::thread launch_flipper_thread(rotate_flipper);
             }
-        } else {
-            motor_flipper.stop(vex::brakeType::brake);
+            
+            //Arm
+            if(Controller.ButtonR1.pressing()) {
+                motor_arm.spin(vex::directionType::fwd, 100 * arm_speed, vex::velocityUnits::pct);
+                motor_flipper.spin(vex::directionType::fwd, 17, vex::velocityUnits::pct);
+            } else if(Controller.ButtonR2.pressing()) {
+                motor_arm.spin(vex::directionType::rev, 100 * arm_speed, vex::velocityUnits::pct);
+                motor_flipper.spin(vex::directionType::rev, 17, vex::velocityUnits::pct);
+            } else {
+                motor_arm.stop(vex::brakeType::brake);
+                if (available_catapult && available_flipper) {
+                    motor_flipper.stop(vex::brakeType::brake);
+                }
+            }
         }
         
-        //Arm
-        if (Controller.ButtonR2.pressing()) {
-            motor_arm.spin(vex::directionType::fwd, 100 * intake_speed, vex::percentUnits::pct);
-        } else if (Controller.ButtonR1.pressing()) {
-            motor_arm.spin(vex::directionType::rev, 100 * intake_speed, vex::percentUnits::pct);
-        } else {
-            motor_intake.stop(vex::brakeType::brake);
+        if (Controller.ButtonLeft.pressing()) {
+            motor_flipper.rotateFor(vex::directionType::fwd, 50, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+        }
+        
+        if (Controller.ButtonDown.pressing()) {
+            motor_flipper.rotateFor(vex::directionType::rev, 50, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
         }
         
         //Catapult    
         if (Controller.ButtonA.pressing()) {
-            if (motor_catapult.isDone()) {
-                motor_catapult.rotateFor(vex::directionType::fwd, 360 * (35 * 3), vex::rotationUnits::deg, 100 * catapult_speed, vex::velocityUnits::pct);
-            }
-        } else {
-            motor_catapult.stop(vex::brakeType::brake);
+            vex::thread launch_catapult_thread (launch_catapult);
         }
+        
         vex::this_thread::sleep_for(20);
+    }
+}
+
+void test() {
+    while (1) {
+        std::cout << "---------------------------" << Brain.Timer.time() << std::endl;
+        std::cout << "Catapult:" << pot_catapult.value(vex::analogUnits::range12bit) << std::endl;
+        vex::this_thread::sleep_for(100);
+        //140
     }
 }
 
 int main() {
     // Do not adjust the lines below
-
+    vex::thread test_thread(test);
+    
     // Set up (but don't start) callbacks for autonomous and driver control periods.
     Competition.autonomous(autonomous);
     Competition.drivercontrol(drivercontrol);
