@@ -120,72 +120,109 @@ void auton_1() {
 void auton_2() {
     //RED NEAR
     
-    //drive forward and hit the wall
-    move(false, 24, 100, true);
-    
     
     //setup and shoot flag
     setup_catapult();
+    
+    move(false, 6, 100, true);
+    
+    launch_catapult();
     launch_catapult();
     
-    //knock red cap (@bryan need to test if robot will pass middle line)
-    move(true, 18, 100, true);
+    //drive forward and hit the wall
+    move(false, 18, 100, true);
+    
+    //knock red cap and start intake
+    move(true, 24, 100, true);
     rotate(true, 90, 100, true);
-    move(false, 5, 50, true);
+    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
+    move(false, 34, 50, true);
+    
+    vex::this_thread::sleep_for(500);
+    motor_intake.stop(vex::brakeType::coast);
     
     //setup and park on low platform
     rotate(true, 90, 100, true);
-    move(true, 15, 50, true);
-    move(false, 24, 100, true);
+    move(true, 12, 50, true);
+    move(false, 30, 100, true);
 }
 
 void auton_3() {
     //RED FAR
     
     //shoot flag
-    motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
-    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    setup_catapult();
+    launch_catapult();
+    launch_catapult();
     
-    //knock cone
+    //knock red cap and start intake
     rotate(true, 90, 100, true);
-    move(false, 18, 100, true);
+    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
+    move(false, 34, 100, true);
+    
+    
+    vex::this_thread::sleep_for(500);
+    motor_intake.stop(vex::brakeType::coast);
     
     //park on low platform
     rotate(false, 90, 100, true);
-    move(true, 15, 100, true);
-    move(false, 24, 100, true);
+    move(true, 12, 100, true);
+    move(false, 30, 100, true);
     
     motor_intake.stop(vex::brakeType::brake);
 }
 
 void auton_4() {
-    //BLUE NEAR (@ bryan mirror auton_2)
-    //drive forward and hit the wall
-    move(false, 50, 100, true);
+    //BLUE NEAR
     
-    //drive backwards (more)
-    move(true, 80, 100, true);
-    
-    motor_arm.rotateFor(vex::directionType::rev, 3500, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
-    
-    //drive forwards (less)
-    move(false, 45, 100, true);
-    
-    //setup and shoot
+    //setup and shoot flag
     setup_catapult();
+    
+    move(false, 6, 100, true);
+    
     launch_catapult();
     launch_catapult();
+    
+    //drive forward and hit the wall
+    move(false, 18, 100, true);
+    
+    //knock red cap and start intake
+    move(true, 24, 100, true);
+    rotate(false, 90, 100, true);
+    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
+    move(false, 34, 50, true);
+    
+    vex::this_thread::sleep_for(500);
+    motor_intake.stop(vex::brakeType::coast);
+    
+    //setup and park on low platform
+    rotate(false, 90, 100, true);
+    move(true, 12, 50, true);
+    move(false, 30, 100, true);
+
 }
 
 void auton_5() {
-    //BLUE FAR (@bryan mirror auton_3)
-    motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
+    //BLUE FAR 
     
-    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    //shoot flag
+    setup_catapult();
+    launch_catapult();
+    launch_catapult();
     
-    move(false, 24, 100, true);
+    //knock red cap and start intake
+    rotate(false, 90, 100, true);
+    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
+    move(false, 34, 100, true);
     
-    move(true, 24, 100, true);
+    
+    vex::this_thread::sleep_for(500);
+    motor_intake.stop(vex::brakeType::coast);
+    
+    //park on low platform
+    rotate(true, 90, 100, true);
+    move(true, 12, 100, true);
+    move(false, 30, 100, true);
     
     motor_intake.stop(vex::brakeType::brake);
 }
