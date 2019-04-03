@@ -112,6 +112,7 @@ void rotate_flipper() {
     }
 }
 
+//each tile is 24' x 24'
 void auton_1() {
     //NONE
 }
@@ -120,37 +121,45 @@ void auton_2() {
     //RED NEAR
     
     //drive forward and hit the wall
-    move(false, 50, 100, true);
+    move(false, 24, 100, true);
     
-    move(true, 25, 100, true);
     
-    //setup and shoot
+    //setup and shoot flag
     setup_catapult();
     launch_catapult();
     
-    rotate(true, 5, 100, true);
+    //knock red cap (@bryan need to test if robot will pass middle line)
+    move(true, 18, 100, true);
+    rotate(true, 90, 100, true);
     move(false, 5, 50, true);
-    rotate(true, 15, 100, true);
-    move(true, 15, 50, true);
     
-    move(false, 15, 100, true);
+    //setup and park on low platform
+    rotate(true, 90, 100, true);
+    move(true, 15, 50, true);
+    move(false, 24, 100, true);
 }
 
 void auton_3() {
     //RED FAR
-    motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
     
+    //shoot flag
+    motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
     motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
     
-    move(false, 24, 100, true);
+    //knock cone
+    rotate(true, 90, 100, true);
+    move(false, 18, 100, true);
     
-    move(true, 24, 100, true);
+    //park on low platform
+    rotate(false, 90, 100, true);
+    move(true, 15, 100, true);
+    move(false, 24, 100, true);
     
     motor_intake.stop(vex::brakeType::brake);
 }
 
 void auton_4() {
-    //BLUE NEAR
+    //BLUE NEAR (@ bryan mirror auton_2)
     //drive forward and hit the wall
     move(false, 50, 100, true);
     
@@ -169,7 +178,7 @@ void auton_4() {
 }
 
 void auton_5() {
-    //BLUE FAR
+    //BLUE FAR (@bryan mirror auton_3)
     motor_arm.rotateFor(vex::directionType::rev, 1000, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
     
     motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
