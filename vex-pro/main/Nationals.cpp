@@ -12,12 +12,12 @@ vex::pot pot_flipper(Brain.ThreeWirePort.C);
 vex::pot pot_arm(Brain.ThreeWirePort.A);
 vex::pot pot_catapult(Brain.ThreeWirePort.B);
 vex::motor motor_left_front(vex::PORT19, vex::gearSetting::ratio18_1, false);
-vex::motor motor_left_back(vex::PORT20, vex::gearSetting::ratio18_1, false);
+vex::motor motor_left_middle(vex::PORT20 , vex::gearSetting::ratio18_1, false);
+vex::motor motor_left_back(vex::PORT14, vex::gearSetting::ratio18_1, false);
 vex::motor motor_right_front(vex::PORT17, vex::gearSetting::ratio18_1, true);
-vex::motor motor_right_back(vex::PORT16, vex::gearSetting::ratio18_1, true);
+vex::motor motor_right_middle(vex::PORT16 , vex::gearSetting::ratio18_1, true);
+vex::motor motor_right_back(vex::PORT13, vex::gearSetting::ratio18_1, true);
 vex::motor motor_intake(vex::PORT15, vex::gearSetting::ratio18_1, true);
-vex::motor motor_flipper(vex::PORT9, vex::gearSetting::ratio18_1, false);
-vex::motor motor_arm(vex::PORT10, vex::gearSetting::ratio18_1, true);
 vex::motor motor_catapult(vex::PORT18, vex::gearSetting::ratio18_1, false);
 //#endregion config_globals
 
@@ -46,36 +46,53 @@ void move(bool reverse, double inches, double percent, bool asynchronous) {
     }
     
     motor_left_front.setReversed(left);
+    motor_left_middle.setReversed(left);
     motor_left_back.setReversed(left);
     motor_right_front.setReversed(right);
+    motor_right_middle.setReversed(right);
     motor_right_back.setReversed(right);
     
     motor_left_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    motor_left_middle.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_left_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_right_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    motor_right_middle.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_right_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
     
     motor_left_front.stop(vex::brakeType::brake);
+    motor_left_middle.stop(vex::brakeType::brake);
     motor_left_back.stop(vex::brakeType::brake);
     motor_right_front.stop(vex::brakeType::brake);
+    motor_right_middle.stop(vex::brakeType::brake);
     motor_right_back.stop(vex::brakeType::brake);
 }
 
-void rotate(bool reverse, double degrees, double percent, bool asynchronous) {
+void rotate(bool counterclockwise, double degrees, double percent, bool asynchronous) {
     
     double degreeswheel_per_inch = 42.97;//number of degrees each wheel motor needs to turn to move 1 inch (need to multiply by gear ratio of 18:12) (42.971834634811741)
-    double degreesrobot_per_inch = 0.164/1.5; //number of inches robot needs to move to rotate 1 degree (0.163624617374468)
+    double degreesrobot_per_inch = 0.172/1.5; //number of inches robot needs to move to rotate 1 degree (0.163624617374468)
     double rotation_goal = degreeswheel_per_inch*degreesrobot_per_inch*degrees;
     
-    motor_left_front.setReversed(reverse);
-    motor_left_back.setReversed(reverse);
-    motor_right_front.setReversed(reverse);
-    motor_right_back.setReversed(reverse);
+    motor_left_front.setReversed(counterclockwise);
+    motor_left_middle.setReversed(counterclockwise);
+    motor_left_back.setReversed(counterclockwise);
+    motor_right_front.setReversed(counterclockwise);
+    motor_right_middle.setReversed(counterclockwise);
+    motor_right_back.setReversed(counterclockwise);
     
     motor_left_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    motor_left_middle.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_left_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_right_front.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
+    motor_right_middle.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, false);
     motor_right_back.rotateFor(rotation_goal, vex::rotationUnits::deg, percent, vex::velocityUnits::pct, asynchronous); //Execute all commands at the same time
+    
+    motor_left_front.stop(vex::brakeType::brake);
+    motor_left_middle.stop(vex::brakeType::brake);
+    motor_left_back.stop(vex::brakeType::brake);
+    motor_right_front.stop(vex::brakeType::brake);
+    motor_right_middle.stop(vex::brakeType::brake);
+    motor_right_back.stop(vex::brakeType::brake);
 }
 
 void setup_catapult() {
@@ -84,7 +101,7 @@ void setup_catapult() {
         //wait
     }
     
-    while (pot_catapult.value(vex::analogUnits::range12bit) > 275 || pot_catapult.value(vex::analogUnits::range12bit) < 75) {//Launch angle
+    while (pot_catapult.value(vex::analogUnits::range12bit) > 675 || pot_catapult.value(vex::analogUnits::range12bit) < 475) {//Launch angle
         motor_catapult.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
     }
     motor_catapult.stop(vex::brakeType::brake);
@@ -102,16 +119,6 @@ void launch_catapult() {
     }
 }
 
-bool available_flipper = true;
-void rotate_flipper() {
-    if (available_flipper) {
-        available_flipper = false;
-        motor_flipper.rotateFor(vex::directionType::fwd, 450, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
-        available_flipper = true;
-        motor_flipper.stop(vex::brakeType::brake);
-    }
-}
-
 //each tile is 24' x 24'
 void auton_1() {
     //NONE
@@ -120,30 +127,27 @@ void auton_1() {
 void auton_2() {
     //RED NEAR
     
-    
     //setup and shoot flag
     setup_catapult();
-    
     move(false, 6, 100, true);
-    
-    launch_catapult();
     launch_catapult();
     
     //drive forward and hit the wall
-    move(false, 18, 100, true);
+    move(false, 15, 100, true);
+    move(false, 3, 50, true);
     
     //knock red cap and start intake
     move(true, 24, 100, true);
     rotate(true, 90, 100, true);
-    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
-    move(false, 34, 50, true);
-    
+    move(false, 10, 50, true);
+    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    move(true, 34, 50, true);
     vex::this_thread::sleep_for(500);
     motor_intake.stop(vex::brakeType::coast);
     
-    //setup and park on low platform
+    //park on low platform
+    move (false, 10, 100, true);
     rotate(true, 90, 100, true);
-    move(true, 12, 50, true);
     move(false, 30, 100, true);
 }
 
@@ -153,23 +157,19 @@ void auton_3() {
     //shoot flag
     setup_catapult();
     launch_catapult();
-    launch_catapult();
     
     //knock red cap and start intake
     rotate(true, 90, 100, true);
-    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
-    move(false, 34, 100, true);
-    
-    
+    move(false, 10, 50, true);
+    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    move(true, 34, 50, true);
     vex::this_thread::sleep_for(500);
     motor_intake.stop(vex::brakeType::coast);
     
     //park on low platform
+    move (false, 10, 100, true);
     rotate(false, 90, 100, true);
-    move(true, 12, 100, true);
     move(false, 30, 100, true);
-    
-    motor_intake.stop(vex::brakeType::brake);
 }
 
 void auton_4() {
@@ -177,29 +177,26 @@ void auton_4() {
     
     //setup and shoot flag
     setup_catapult();
-    
     move(false, 6, 100, true);
-    
-    launch_catapult();
     launch_catapult();
     
     //drive forward and hit the wall
-    move(false, 18, 100, true);
+    move(false, 15, 100, true);
+    move(false, 3, 50, true);
     
-    //knock red cap and start intake
+    //knock blue cap and start intake
     move(true, 24, 100, true);
     rotate(false, 90, 100, true);
-    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
-    move(false, 34, 50, true);
-    
+    move(false, 10, 50, true);
+    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    move(true, 34, 50, true);
     vex::this_thread::sleep_for(500);
     motor_intake.stop(vex::brakeType::coast);
     
-    //setup and park on low platform
+    //park on low platform
+    move (false, 10, 100, true);
     rotate(false, 90, 100, true);
-    move(true, 12, 50, true);
     move(false, 30, 100, true);
-
 }
 
 void auton_5() {
@@ -208,23 +205,19 @@ void auton_5() {
     //shoot flag
     setup_catapult();
     launch_catapult();
-    launch_catapult();
     
     //knock red cap and start intake
     rotate(false, 90, 100, true);
-    motor_intake.spin(vex::directionTyp::fwd, 100, vex::velocityUnits::pct);
-    move(false, 34, 100, true);
-    
-    
+    move(false, 10, 50, true);
+    motor_intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    move(true, 34, 50, true);
     vex::this_thread::sleep_for(500);
     motor_intake.stop(vex::brakeType::coast);
     
     //park on low platform
+    move (false, 10, 100, true);
     rotate(true, 90, 100, true);
-    move(true, 12, 100, true);
     move(false, 30, 100, true);
-    
-    motor_intake.stop(vex::brakeType::brake);
 }
 
 void autonomous() {
@@ -958,10 +951,23 @@ void drivercontrol() {
         // movements based on input from the controller.
 
         motor_left_front.spin(vex::directionType::fwd, Controller.Axis3.position(vex::percentUnits::pct), vex::velocityUnits::pct);
+        motor_left_middle.spin(vex::directionType::fwd, Controller.Axis3.position(vex::percentUnits::pct), vex::velocityUnits::pct);
         motor_left_back.spin(vex::directionType::fwd, Controller.Axis3.position(vex::percentUnits::pct), vex::velocityUnits::pct);
         motor_right_front.spin(vex::directionType::fwd, Controller.Axis2.position(vex::percentUnits::pct), vex::velocityUnits::pct);
+        motor_right_middle.spin(vex::directionType::fwd, Controller.Axis2.position(vex::percentUnits::pct), vex::velocityUnits::pct);
         motor_right_back.spin(vex::directionType::fwd, Controller.Axis2.position(vex::percentUnits::pct), vex::velocityUnits::pct);
     
+        if (Controller.Axis3.position(vex::percentUnits::pct) < 5 && Controller.Axis3.position(vex::percentUnits::pct) > -5) {
+            motor_left_front.stop(vex::brakeType::brake);
+            motor_left_middle.stop(vex::brakeType::brake);
+            motor_left_back.stop(vex::brakeType::brake);
+        }
+        if (Controller.Axis2.position(vex::percentUnits::pct) < 5 && Controller.Axis2.position(vex::percentUnits::pct) > -5) {
+            motor_right_front.stop(vex::brakeType::brake);
+            motor_right_middle.stop(vex::brakeType::brake);
+            motor_right_back.stop(vex::brakeType::brake);
+        }
+        
         //Intake
         if(Controller.ButtonL1.pressing()) {
             motor_intake.spin(vex::directionType::fwd, 100 * intake_speed, vex::velocityUnits::pct);
@@ -969,35 +975,6 @@ void drivercontrol() {
             motor_intake.spin(vex::directionType::rev, 100 * intake_speed, vex::velocityUnits::pct);
         } else {
             motor_intake.stop(vex::brakeType::brake);       
-        }
-        
-        if (!((Controller.ButtonR1.pressing() && Controller.ButtonY.pressing()) || (Controller.ButtonR2.pressing() && Controller.ButtonY.pressing()))) {
-            //Flipper
-            if (Controller.ButtonY.pressing()) {
-                vex::thread launch_flipper_thread(rotate_flipper);
-            }
-            
-            //Arm
-            if(Controller.ButtonR1.pressing()) {
-                motor_arm.spin(vex::directionType::fwd, 100 * arm_speed, vex::velocityUnits::pct);
-                motor_flipper.spin(vex::directionType::fwd, 17, vex::velocityUnits::pct);
-            } else if(Controller.ButtonR2.pressing()) {
-                motor_arm.spin(vex::directionType::rev, 100 * arm_speed, vex::velocityUnits::pct);
-                motor_flipper.spin(vex::directionType::rev, 17, vex::velocityUnits::pct);
-            } else {
-                motor_arm.stop(vex::brakeType::brake);
-                if (available_catapult && available_flipper) {
-                    motor_flipper.stop(vex::brakeType::brake);
-                }
-            }
-        }
-        
-        if (Controller.ButtonLeft.pressing()) {
-            motor_flipper.rotateFor(vex::directionType::fwd, 50, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
-        }
-        
-        if (Controller.ButtonDown.pressing()) {
-            motor_flipper.rotateFor(vex::directionType::rev, 50, vex::rotationUnits::deg, 100, vex::velocityUnits::pct, true);
         }
         
         //Catapult    
